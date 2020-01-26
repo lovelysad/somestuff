@@ -18,12 +18,12 @@ class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
 
         working_hour_items = [str(m) for m in range(0,4,1)]
         self.comboBox_workingh.addItems(working_hour_items)
-        working_minutes_items = [str(mm) for mm in range(1,5,1)] + [str(m) for m in range(0,60,5)]
+        working_minutes_items = [str(m) for m in range(0,60,5)] + [str(mm) for mm in range(1,5,1)]
         self.comboBox_workingm.addItems(working_minutes_items)
 
         chilling_hour_items = [str(m) for m in range(0,4,1)]
         self.comboBox_chillingh.addItems(chilling_hour_items)
-        chilling_minutes_items = [str(mm) for mm in range(1,5,1)] + [str(m) for m in range(0,60,5)]
+        chilling_minutes_items =  [str(m) for m in range(0,60,5)] + [str(mm) for mm in range(1,5,1)]
         self.comboBox_chillingm.addItems(chilling_minutes_items)
 
         self.button_begin.clicked.connect(self.setReminder)
