@@ -57,8 +57,12 @@ class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
             elif result == QMessageBox.Ok:
                 pass
 
-            print("work begin")
-            QtTest.QTest.qWait(working_seconds*1000)
+            print("work begins at", time.ctime())
+            ms = working_seconds*1000
+            print("milliseconds:",ms)
+            print(type(ms))
+            QtTest.QTest.qWait(ms)
+            print("work ends at", time.ctime())
 
             if self.button_begin.text() == "Begin":
                 break
@@ -72,9 +76,10 @@ class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
             print(msg[language])
 
             pyautogui.alert(title="Well...",text=msg[language],timeout=4000)
-            print("chill begin")
+            print("chill begins")
 
             QtTest.QTest.qWait((chilling_seconds-4)*1000)
+            print("chill ends at", time.ctime())
 
             if self.button_begin.text() == "Begin":
                 break
