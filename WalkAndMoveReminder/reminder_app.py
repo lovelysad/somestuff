@@ -2,17 +2,15 @@ import reminder_design
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QFormLayout, QMessageBox
-import traceback, sys, re,pyautogui, playsound, time, ast
+import traceback, sys, pyautogui, playsound, time, ast
 from PyQt5.QtMultimedia import QSound
 from PyQt5 import QtTest
 from pydub import AudioSegment
 
 class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
 
-    minute_regex = re.compile(r'(\d+) minutes')
-    hour_regex = re.compile(r'(\d+) hour')
-
     def __init__(self):
+
         super(ReminderApp,self).__init__()
         self.setupUi(self)
         self.setFixedSize(534,354)
@@ -73,18 +71,6 @@ class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
             msg = [eng_msg, chi_msg]
             print(msg[language])
 
-            # msgbox = QMessageBox()
-            # msgbox.setWindowTitle("Chill alarm")
-            # msgbox.setText(msg[language])
-            # msgbox.setStandardButtons(QMessageBox.Ok|QMessageBox.Cancel)
-            # msgbox.setDefaultButton(QMessageBox.Ok)
-            # result = msgbox.exec_()
-            # if result == QMessageBox.Cancel:
-            #     print("Cancelled")
-            #     self.button_begin.setText("Begin")
-            #     break
-            # elif result == QMessageBox.Ok:
-            #     pass
             pyautogui.alert(title="Well...",text=msg[language],timeout=4000)
             print("chill begin")
 
@@ -114,40 +100,6 @@ class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
             ttl_working_minutes = working_h * 60 + working_m
             ttl_chilling_minutes = chilling_h * 60 + chilling_m
 
-            # working_period = self.comboBox_workingp.currentText()
-            # chilling_period = self.comboBox__chillingp.currentText()
-            #
-            # working_hour = self.hour_regex.findall(working_period)
-            # working_minutes_from_hour = 0
-            # if working_hour:
-            #     working_hour = int(working_hour[0])
-            #     working_minutes_from_hour = 60 * working_hour
-            #
-            # working_minutes = self.minute_regex.findall(working_period)
-            # if working_minutes:
-            #     working_minutes = int(working_minutes[0])
-            # else:
-            #     working_minutes = 0
-            #
-            # total_working_minutes = working_minutes_from_hour + working_minutes
-            # print("total_working_minutes:", total_working_minutes)
-            #
-            # chilling_hour = self.hour_regex.findall(chilling_period)
-            # if chilling_hour:
-            #     chilling_hour = int(chilling_hour[0])
-            # else:
-            #     chilling_hour = 0
-            # chilling_minutes_from_hour = 60 * chilling_hour
-            #
-            # chilling_minutes = self.minute_regex.findall(chilling_period)
-            # if chilling_minutes:
-            #     chilling_minutes = int(chilling_minutes[0])
-            # else:
-            #     chilling_minutes = 0
-            #
-            # total_chilling_minutes = chilling_minutes_from_hour + chilling_minutes
-            # print("total_chilling_minutes:", total_chilling_minutes)
-
             self.reminder(ttl_working_minutes, ttl_chilling_minutes, 0)
             print("loop has ended")
 
@@ -156,16 +108,11 @@ class ReminderApp(reminder_design.Ui_MainWindow,QtWidgets.QMainWindow):
             print("You just clicked \"End\"")
             return
 
-
-
-
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     print("error catched!:")
     print("error message:\n", tb)
     pyautogui.alert(title="E r r o r",text=tb)
-    #QtWidgets.QApplication.quit()
-    # or QtWidgets.QApplication.exit(0)
 
 if __name__ == '__main__':
     sys.excepthook = excepthook
