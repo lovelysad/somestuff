@@ -67,10 +67,34 @@ class pandoraBot:
         names_ele = self.driver.find_elements_by_xpath('//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]')
         names = [name.text for name in names_ele if name.text != '']
 
-        public_box = self.driver.find_element_by_xpath('//span[contains(text(),Facebook - Public)]')
+        #public_box = self.driver.find_element_by_xpath('//span[contains(text(),"Facebook - Public")]//*//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]')
+        public_box = self.driver.find_element_by_xpath('//span[contains(text(),"Facebook - Public")]')
         names_ele = public_box.find_elements_by_xpath('//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]')
 
+        ticket_ele = self.driver.find_elements_by_xpath('//article[@class = "streamEntity spr"]')
+        for i in ticket_ele:
+            ticket_name = i.find_element_by_xpath('.//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]').text
+            ticket_text = i.find_element_by_xpath('.//div[@class="msgContent"]').text
+            try:
+                ticket_link = i.find_element_by_xpath('.//a[@class = "msgTimeStamp msgHeaderSubText spr-text-02 txt-bd4 pull-xs-right m-l-1 msgTimeStampRenderAsLink"]').get_attribute("href")
+            except:
+                ticket_link = ""
+            try:
+                ticket_time = i.find_element_by_xpath('.//a[contains(@aria-label,"Added to Queue on")]').get_attribute("aria-label")
+            except:
+                ticket_time = ""
 
+            try:
+                ticket_image = i.find_element_by_xpath('.//img[@class = "show mediaImgContent scp"]').get_attribute("src")
+            except:
+                ticket_image = None
+
+            print(ticket_name,ticket_text,ticket_link,ticket_time,"\n")
+            if ticket_image:
+                print(ticket_image,"\n")
+
+# a = pandoraBot()
+# a.login()
 
 
 
