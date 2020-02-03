@@ -1,20 +1,24 @@
 #  -*- coding: utf-8 -*-
 
 from selenium import webdriver
-import time
+import time, re
 from secret import username, password
+import pandas as pd
 
 #python -i pandora_scraper.py
 
 class pandoraBot:
 
+    comment_tickets = []
+    inbox_tickets = []
+
     def __init__(self):
-        self.driver = webdriver.Chrome(executable_path="D:\chromedriver_win32\chromedriver")
+        self.driver = webdriver.Chrome(executable_path=r"C:\Users\abc\PycharmProjects\chromedriver_win32\chromedriver.exe")
 
     def login(self):
         self.driver.get("https://space.sprinklr.com/new")
 
-        time.sleep(5)
+        time.sleep(7)
 
         email_input = self.driver.find_element_by_xpath('//*[@id="root"]/div/section[2]/section/div[1]/div/div/div/div/div/div/form/div[1]/div/input')
         time.sleep(0.5)
@@ -51,6 +55,8 @@ class pandoraBot:
 
         fb_username_ele = self.driver.find_element_by_xpath('//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]')
         fb_username = fb_username_ele.text
+
+
         scroll_height = 0
         for _ in range(4):
             scroll_height += 260
@@ -71,6 +77,8 @@ class pandoraBot:
         public_box = self.driver.find_element_by_xpath('//span[contains(text(),"Facebook - Public")]')
         names_ele = public_box.find_elements_by_xpath('//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]')
 
+
+        ##########################
         ticket_ele = self.driver.find_elements_by_xpath('//article[@class = "streamEntity spr"]')
         for i in ticket_ele:
             ticket_name = i.find_element_by_xpath('.//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]').text
@@ -80,7 +88,7 @@ class pandoraBot:
             except:
                 ticket_link = ""
             try:
-                ticket_time = i.find_element_by_xpath('.//a[contains(@aria-label,"Added to Queue on")]').get_attribute("aria-label")
+                ticket_time = i.find_element_by_xpath('.//a[contains(@aria-label,"Posted on")]').get_attribute("aria-label")
             except:
                 ticket_time = ""
 
@@ -89,12 +97,105 @@ class pandoraBot:
             except:
                 ticket_image = None
 
+            msgtime_regex = re.compile(r'Posted on(.*)')
+            ticket_time = msgtime_regex.search(ticket_time).group()
+
             print(ticket_name,ticket_text,ticket_link,ticket_time,"\n")
             if ticket_image:
                 print(ticket_image,"\n")
+        ######################
 
-# a = pandoraBot()
-# a.login()
+    def getTicketContent(self):
+
+        ticket_ele = self.driver.find_elements_by_xpath('//article[@class = "streamEntity spr"]')
+
+        comment_tickets = []
+        inbox_tickets = []
+
+        for i in ticket_ele:
+            ticket_name = i.find_element_by_xpath('.//div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]').text
+            ticket_text = i.find_element_by_xpath('.//div[@class="msgContent"]').text
+
+            try:
+                ticket_link = i.find_element_by_xpath('.//a[@class = "msgTimeStamp msgHeaderSubText spr-text-02 txt-bd4 pull-xs-right m-l-1 msgTimeStampRenderAsLink"]').get_attribute("href")
+                if "inbox" in ticket_link:
+                    ticket_link = "Inbox"
+            except:
+                ticket_link = ""
+
+            try:
+                ticket_time = i.find_element_by_xpath('.//a[contains(@aria-label,"Posted on")]').get_attribute("aria-label")
+                msgtime_regex = re.compile(r'Posted on(.*)')
+                if ticket_time:
+                    ticket_time = msgtime_regex.search(ticket_time).group(1)
+            except:
+                ticket_time = ""
+
+            try:
+                ticket_image = i.find_element_by_xpath('.//img[@class = "show mediaImgContent scp"]').get_attribute("src")
+            except:
+                ticket_image = None
+
+            if ticket_image and ticket_text:
+                ticket_text = ticket_text + "\n" + ticket_image
+            elif ticket_image and ticket_text == "":
+                ticket_text = ticket_image
+
+            per_ticket_content = [ticket_time,ticket_name,ticket_text,ticket_link]
+            if ticket_link == "Inbox":
+                if per_ticket_content not in self.inbox_tickets:
+                    self.inbox_tickets.append(per_ticket_content)
+            elif ticket_link != "" and ticket_link != "Inbox":
+                if per_ticket_content not in self.comment_tickets:
+                    self.comment_tickets.append(per_ticket_content)
+
+
+            #print(ticket_name,ticket_text,ticket_link,ticket_time,"\n")
+            # if ticket_image:
+            #     print(ticket_image,"\n")
+
+
+    def print_dataframe(self):
+
+        if len(self.comment_tickets) > 0:
+            df_comment = pd.DataFrame(self.comment_tickets,columns=["Message_Time","Customer_Name","Enquiry","URL"])
+
+            df_comment["Message_Time"] = pd.to_datetime(df_comment.Message_Time)
+            df_comment = df_comment.sort_values(by='Message_Time', ascending=False)
+
+            df_comment["Message_Time"] = df_comment["Message_Time"].dt.strftime("%A, %B %d, %Y %I:%M:%S %p")
+
+            print(df_comment)
+            print(self.comment_tickets)
+        if len(self.inbox_tickets) > 0:
+            df_inbox = pd.DataFrame(self.inbox_tickets,columns=["Message_Time","Customer_Name","Enquiry","URL"])
+
+            df_inbox["Message_Time"] = pd.to_datetime(df_inbox.Message_Time)
+            df_inbox = df_inbox.sort_values(by='Message_Time',ascending=False)
+
+            df_inbox["Message_Time"] = df_inbox["Message_Time"].dt.strftime("%A, %B %d, %Y %I:%M:%S %p")
+
+            print(df_inbox)
+            print(self.inbox_tickets)
+
+    def test(self,scrolls = 4 ):
+        scroll_box_public = self.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div')
+        #scroll_box_private = a.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[3]/div/div[2]/div[2]/div/div/section/div')
+        scroll_height = 0
+        for _ in range(scrolls):
+            scroll_height += 260
+            self.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_public)
+            time.sleep(0.2)
+            #a.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_private)
+            #a.driver.execute_script("arguments[0].scrollTo(0, 260)", scroll_box_private)
+            time.sleep(0.2)
+            self.getTicketContent()
+        self.print_dataframe()
+
+
+
+a = pandoraBot()
+a.login()
 
 
 
