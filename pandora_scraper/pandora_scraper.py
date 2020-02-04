@@ -5,6 +5,7 @@ import time, re
 from secret import username, password
 import pandas as pd
 import openpyxl
+from selenium.webdriver.common.action_chains import ActionChains
 
 #python -i pandora_scraper.py
 
@@ -279,6 +280,22 @@ class pandoraBot:
                     sheet_private.cell(row=2+i,column=n+1).value = each_piece_of_info
 
             wb.save(self.export_path)
+
+    def reply(self):
+        ticket_frame = a.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
+        hover = ActionChains(a.driver).move_to_element(ticket_frame)
+        hover.perform()
+        reply_btn = a.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]/section/section/article/div/div/section[2]/div[2]/div[3]/div/span/span[3]/button')
+        reply_btn.click()
+
+        reply_box = a.driver.find_element_by_xpath('//*[@id="sprBasePublisher_REPLY"]/div/section[3]/div/div/div[1]/div/div/div/div/div[2]/div')
+        reply_box.send_keys("test")
+
+        close_reply_box_btn = a.driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/article/div[1]/button')
+        close_reply_box_btn.click()
+
+        post_btn = a.driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/article/div[3]/div[2]/div/button[2]')
+        post_btn.click()
 
 
 
