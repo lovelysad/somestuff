@@ -58,7 +58,22 @@ def df_to_list():
     print(liss)
     #print('list', [df[i].tolist() for i in df.iterrows()])
 
-df_to_list()
+def test_list():
+    tickets_needed_to_reply = [
+        ['Wednesday, February 05, 2020 3:12:30 AM', 'Lok Daisy', '拎條鍊去洗，會屈你條鍊用洗銀水浸過，然後同你講洗唔到原來既色架！仲買？',
+         'https://www.facebook.com/153753694819713/posts/1251826478345757/?comment_id=1252278748300530'],
+        ['Wednesday, February 05, 2020 7:49:58 AM', 'Crystal Man', '價錢超貴，質量極差👎仲衰過爛銅爛鐵😤',
+         'https://www.facebook.com/153753694819713/posts/1251251691736569/?comment_id=1252428578285547'],
+    ]
+
+    responses = [
+        tickets_needed_to_reply[0] + ["complaints", "No response required"],
+        tickets_needed_to_reply[1] + ["complaints", "No response required"]
+    ]
+
+    print(responses)
+
+test_list()
 
 
 
