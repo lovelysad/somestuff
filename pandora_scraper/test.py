@@ -75,5 +75,7 @@ def test_list():
 
 test_list()
 
+#python -i pandora_scraper.py
+
 
 

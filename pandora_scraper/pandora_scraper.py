@@ -9,6 +9,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 
 #python -i pandora_scraper.py
 
@@ -268,15 +269,14 @@ class pandoraBot:
     def rtest(self,scrolltimes=40):
 
         tickets_needed_to_reply = [
-            ['Wednesday, February 05, 2020 3:12:30 AM', 'Lok Daisy', '拎條鍊去洗，會屈你條鍊用洗銀水浸過，然後同你講洗唔到原來既色架！仲買？', 'https://www.facebook.com/153753694819713/posts/1251826478345757/?comment_id=1252278748300530'],
-            ['Wednesday, February 05, 2020 7:49:58 AM', 'Crystal Man', '價錢超貴，質量極差👎仲衰過爛銅爛鐵😤','https://www.facebook.com/153753694819713/posts/1251251691736569/?comment_id=1252428578285547'],
-        ]
+            ['Thursday, February 06, 2020 10:44:50 AM', 'Lok Daisy', 'Pandora 不如你話我知，我咁樣俾人屈，你地可以點協助我？', 'https://www.facebook.com/153753694819713/posts/1249085878619817/?comment_id=1251110855083986&reply_comment_id=1253223401539398'],
+             ]
 
 
-        responses = [
-            tickets_needed_to_reply[0] + ["complaints","No response required"],
-            tickets_needed_to_reply[1] + ["complaints","No response required"]
-        ]
+        # responses = [
+        #     tickets_needed_to_reply[0] + ["complaints","No response required"],
+        #     tickets_needed_to_reply[1] + ["other","No response required"]
+        # ]
 
         scroll_box_public = self.driver.find_element_by_xpath(
             '//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div')
@@ -320,7 +320,7 @@ class pandoraBot:
 
 
             print(per_ticket_content)
-            #if per_ticket_content == "價錢超貴，質量極差👎仲衰過爛銅爛鐵😤":
+
             if per_ticket_content in tickets_needed_to_reply:
 
                 ticket_frame.click()
@@ -328,19 +328,39 @@ class pandoraBot:
                 tickets_needed_to_reply.remove(per_ticket_content)
 
                 wait = WebDriverWait(self.driver, 10)
-                #dot_batch_ele = self.driver.find_element_by_xpath('//*[@id="sprBody"]/section/div[2]/div[1]/article/section[2]/section/div/div[5]')
-                dot_batch_ele = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprBody"]/section/div[2]/div[1]/article/section[2]/section/div/div[5]')))
+
                 actions = ActionChains(self.driver)
-                actions.move_to_element(dot_batch_ele).perform()
-                #update_tag_btn = wait.until(EC.element_to_be_clickable((By.XPATH, '//div[@class="_1ZpM flex-item-1"]')))
-                update_tag_btn = wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_1ZpM flex-item-1" and contains(text(),"Update Tags")]')))
-                update_tag_btn.click()
+                actions.move_to_element(ticket_frame)
+                actions.perform()
+                print("hovering on the ticket")
 
-                tag_field = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="react-select-2--value"]/div[2]')))
-                tag_field.send_keys("complaints")
 
-                update_btn = self.driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[3]/div/button[2]')
-                update_btn.click()
+                #reply_btn = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]/section/section/article/div/div/section[2]/div[2]/div[3]/div/span/span[3]/button')))
+                time.sleep(1)
+                reply_btn = ticket_frame.find_element_by_xpath('.//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]/section/section/article/div/div/section[2]/div[2]/div[3]/div/span/span[3]/button')
+                reply_btn.click()
+
+                reply_box = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprBasePublisher_REPLY"]/div/section[3]/div/div/div[1]/div/div/div/div/div[2]/div')))
+                reply_box.send_keys("Hi Lok Daisy，非常抱歉你有以上經歷。請你電郵至 pap.cs@Pandora.net 提供姓名、聯絡電話同詳情，我哋會作出跟進。多謝！")
+
+                """update tags"""
+                # dot_batch_ele = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprBody"]/section/div[2]/div[1]/article/section[2]/section/div/div[5]')))
+                # actions = ActionChains(self.driver)
+                # actions.move_to_element(dot_batch_ele).perform()
+                #
+                # update_tag_btn = wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_1ZpM flex-item-1" and contains(text(),"Update Tags")]')))
+                # update_tag_btn.click()
+                #
+                # tag_arrow = wait.until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[4]/div/div[2]/div[2]/div[1]/div/div/div/span[2]')))
+                # tag_arrow.click()
+                #
+                # tag_select = wait.until(EC.visibility_of_element_located((By.XPATH,'//input[@role="combobox"]')))
+                # tag_select.send_keys('complaints')
+                # tag_select.send_keys(Keys.ENTER)
+                # time.sleep(0.5)
+                #
+                # update_btn = self.driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[3]/div/button[2]')
+                # update_btn.click()
 
 
                 time.sleep(4)
