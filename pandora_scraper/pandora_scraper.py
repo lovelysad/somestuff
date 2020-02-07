@@ -269,9 +269,8 @@ class pandoraBot:
     def rtest(self,scrolltimes=40):
 
         tickets_needed_to_reply = [
-            ['Thursday, February 06, 2020 10:44:50 AM', 'Lok Daisy', 'Pandora 不如你話我知，我咁樣俾人屈，你地可以點協助我？', 'https://www.facebook.com/153753694819713/posts/1249085878619817/?comment_id=1251110855083986&reply_comment_id=1253223401539398'],
-             ]
-
+            ['Thursday, February 06, 2020 4:42:38 PM', 'Lok Daisy', '拎條鍊去洗，會屈你條鍊用洗銀水浸過，然後同你講洗唔到原來既色架！仲買？','https://www.facebook.com/153753694819713/posts/2240275839408885/?comment_id=2240277299408739'],
+        ]
 
         # responses = [
         #     tickets_needed_to_reply[0] + ["complaints","No response required"],
@@ -283,7 +282,7 @@ class pandoraBot:
         scroll_height = -30
         for i in range(scrolltimes):
             scroll_height += 30
-            a.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_public)
+            self.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_public)
             time.sleep(0.2)
             ticket_frame = self.driver.find_element_by_xpath(
                 '//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
@@ -334,14 +333,33 @@ class pandoraBot:
                 actions.perform()
                 print("hovering on the ticket")
 
-
                 #reply_btn = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]/section/section/article/div/div/section[2]/div[2]/div[3]/div/span/span[3]/button')))
                 time.sleep(1)
-                reply_btn = ticket_frame.find_element_by_xpath('.//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]/section/section/article/div/div/section[2]/div[2]/div[3]/div/span/span[3]/button')
-                reply_btn.click()
 
-                reply_box = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprBasePublisher_REPLY"]/div/section[3]/div/div/div[1]/div/div/div/div/div[2]/div')))
-                reply_box.send_keys("Hi Lok Daisy，非常抱歉你有以上經歷。請你電郵至 pap.cs@Pandora.net 提供姓名、聯絡電話同詳情，我哋會作出跟進。多謝！")
+                for i in range(8):
+                    replyActions = ActionChains(self.driver)
+                    replyActions = replyActions.send_keys(Keys.TAB)
+                    replyActions.perform()
+                    time.sleep(0.7)
+                    try:
+                        reply_tip = self.driver.find_element_by_xpath('//div[@class="tooltip-inner" and contains(text(),"Reply")]')
+                        print("reply tip found")
+                        actions = ActionChains(self.driver)
+                        actions = actions.send_keys(Keys.SPACE)
+                        actions.perform()
+                        print("opening reply box")
+                        break
+                    except:
+                        pass
+                print("reply box opened")
+
+                reply_box_input = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprBasePublisher_REPLY"]/div/section[3]/div/div/div[1]/div/div/div/div/div[2]/div')))
+                reply_box_input.send_keys("t")
+
+                time.sleep(0.8)
+                close_reply_box_btn = self.driver.find_element_by_xpath('//div[@class="-kp0 spr p-l-5 p-x-3"]/button[@type = "button" and @class = "iconButton fill-icon-button center-x-y icon-btn-cont-30 focus-border"]')
+                self.driver.execute_script("arguments[0].click();", close_reply_box_btn)
+                print("reply box closed")
 
                 """update tags"""
                 # dot_batch_ele = wait.until(EC.visibility_of_element_located((By.XPATH,'//*[@id="sprBody"]/section/div[2]/div[1]/article/section[2]/section/div/div[5]')))
@@ -394,7 +412,7 @@ class pandoraBot:
         return df_comment,df_inbox
 
 
-    def test(self,scrolls = 5 ):
+    def getTickets(self,scrolls = 5 ):
         scroll_box_public = self.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div')
         scroll_box_private = self.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[3]/div/div[2]/div[2]/div/div/section/div')
         #scroll_box_private[0].location_once_scrolled_into_view
