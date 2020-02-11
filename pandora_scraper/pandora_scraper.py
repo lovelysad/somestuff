@@ -182,16 +182,82 @@ class pandoraBot:
 
         scroll_box_private = self.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[3]/div/div[2]/div[2]/div/div/section/div')
 
+        def getTicketContent(self):
+
+
+            comment_tickets = []
+            inbox_tickets = []
+
+            for i in ticket_ele:
+                ticket_name = i.find_element_by_xpath(
+                    './/div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]').text
+                ticket_text = i.find_element_by_xpath('.//div[@class="msgContent"]').text
+
+                try:
+                    ticket_link = i.find_element_by_xpath(
+                        './/a[@class = "msgTimeStamp msgHeaderSubText spr-text-02 txt-bd4 pull-xs-right m-l-1 msgTimeStampRenderAsLink"]').get_attribute(
+                        "href")
+                    if "inbox" in ticket_link:
+                        ticket_link = "Inbox"
+                except:
+                    ticket_link = ""
+
+                try:
+                    ticket_time = i.find_element_by_xpath('.//a[contains(@aria-label,"Posted on")]').get_attribute(
+                        "aria-label")
+                    msgtime_regex = re.compile(r'Posted on(.*)')
+                    if ticket_time:
+                        ticket_time = msgtime_regex.search(ticket_time).group(1)
+                except:
+                    ticket_time = ""
+
+                try:
+                    ticket_image = i.find_element_by_xpath('.//img[@class = "show mediaImgContent scp"]').get_attribute(
+                        "src")
+                except:
+                    ticket_image = None
+
+                if ticket_image and ticket_text:
+                    ticket_text = ticket_text + "\n" + ticket_image
+                elif ticket_image and ticket_text == "":
+                    ticket_text = ticket_image
+
+                per_ticket_content = [ticket_time, ticket_name, ticket_text, ticket_link]
+                if ticket_link == "Inbox":
+                    if per_ticket_content not in self.inbox_tickets:
+                        self.inbox_tickets.append(per_ticket_content)
+                elif ticket_link != "" and ticket_link != "Inbox":
+                    if per_ticket_content not in self.comment_tickets:
+                        self.comment_tickets.append(per_ticket_content)
+
+                # print(ticket_name,ticket_text,ticket_link,ticket_time,"\n")
+                # if ticket_image:
+                #     print(ticket_image,"\n")
+
         scroll_height = -30
         for i in range(scrolltimes):
             scroll_height += 30
             if c_or_i == "comment":
                 self.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_public)
             elif c_or_i == "inbox":
+                #self.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_public)
                 self.driver.execute_script("arguments[0].scrollTo(0, {})".format(scroll_height), scroll_box_private[0])
             time.sleep(0.2)
-            ticket_frame = self.driver.find_element_by_xpath(
-                '//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
+
+            if c_or_i == "comment":
+                ticket_frame = self.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
+            elif c_or_i == "inbox":
+                try:
+                    ticket_frames = self.driver.find_elements_by_xpath('//article[@class = "streamEntity spr"]')
+                    #ticket_frames = self.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
+                    ticket_frame = ticket_frames[3]
+                    print("second element found")
+                    # for i in ticket_frames:
+                    #     print(i.text)
+                except:
+                    ticket_frame = self.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
+                    print("only 1 element found")
+
             ticket_name = ticket_frame.find_element_by_xpath(
                 './/div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]').text
             ticket_text = ticket_frame.find_element_by_xpath('.//div[@class="msgContent"]').text
@@ -258,10 +324,12 @@ class pandoraBot:
                         replyActions = ActionChains(self.driver)
                         replyActions = replyActions.send_keys(Keys.TAB)
                         replyActions.perform()
-                        time.sleep(0.7)
+                        time.sleep(0.6)
                         try:
-                            reply_tip = self.driver.find_element_by_xpath(
-                                '//div[@class="tooltip-inner" and contains(text(),"Reply")]')
+                            if c_or_i == "comment":
+                                reply_tip = self.driver.find_element_by_xpath('//div[@class="tooltip-inner" and contains(text(),"Reply")]')
+                            elif c_or_i == "inbox":
+                                reply_tip = self.driver.find_element_by_xpath('//div[@class="tooltip-inner" and contains(text(),"Private Message")]')
                             print("reply tip found")
                             actions = ActionChains(self.driver)
                             actions = actions.send_keys(Keys.SPACE)
@@ -284,8 +352,11 @@ class pandoraBot:
                         time.sleep(1.5)
 
                     time.sleep(0.8)
-                    close_reply_box_btn = self.driver.find_element_by_xpath('//div[@class="-kp0 spr p-l-5 p-x-3"]/button[@type = "button" and @class = "iconButton fill-icon-button center-x-y icon-btn-cont-30 focus-border"]')
-                    self.driver.execute_script("arguments[0].click();", close_reply_box_btn)
+                    try:
+                        close_reply_box_btn = self.driver.find_element_by_xpath('//div[@class="-kp0 spr p-l-5 p-x-3"]/button[@type = "button" and @class = "iconButton fill-icon-button center-x-y icon-btn-cont-30 focus-border"]')
+                        self.driver.execute_script("arguments[0].click();", close_reply_box_btn)
+                    except:
+                        pass
                     print("reply box closed")
                     time.sleep(0.5)
 

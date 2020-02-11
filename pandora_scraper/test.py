@@ -161,7 +161,9 @@ print(time_b)
 
 
 #python -i pandora_scraper.py
-
+# a.rtest(scrolltimes=70,c_or_i="inbox")
+# ['Monday, February 10, 2020 5:37:48 AM', 'Dave Henz', 'https://s3.amazonaws.com/spr-uploads-prod/815/FACEBOOK/82906/media/F279C2ECD2CC380F0E54A0B4103F302C', 'Inbox']
+# ['Monday, February 10, 2020 5:37:48 PM', 'Dave Henz', 'https://s3.amazonaws.com/spr-uploads-prod/815/FACEBOOK/82906/media/F279C2ECD2CC380F0E54A0B4103F302C', 'Inbox']
 
 def tt():
 
