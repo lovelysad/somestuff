@@ -182,58 +182,6 @@ class pandoraBot:
 
         scroll_box_private = self.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[3]/div/div[2]/div[2]/div/div/section/div')
 
-        def getTicketContent(self):
-
-
-            comment_tickets = []
-            inbox_tickets = []
-
-            for i in ticket_ele:
-                ticket_name = i.find_element_by_xpath(
-                    './/div[@class="msgProfileName spr-text-01 text-13 font-700 text-overflow scp"]').text
-                ticket_text = i.find_element_by_xpath('.//div[@class="msgContent"]').text
-
-                try:
-                    ticket_link = i.find_element_by_xpath(
-                        './/a[@class = "msgTimeStamp msgHeaderSubText spr-text-02 txt-bd4 pull-xs-right m-l-1 msgTimeStampRenderAsLink"]').get_attribute(
-                        "href")
-                    if "inbox" in ticket_link:
-                        ticket_link = "Inbox"
-                except:
-                    ticket_link = ""
-
-                try:
-                    ticket_time = i.find_element_by_xpath('.//a[contains(@aria-label,"Posted on")]').get_attribute(
-                        "aria-label")
-                    msgtime_regex = re.compile(r'Posted on(.*)')
-                    if ticket_time:
-                        ticket_time = msgtime_regex.search(ticket_time).group(1)
-                except:
-                    ticket_time = ""
-
-                try:
-                    ticket_image = i.find_element_by_xpath('.//img[@class = "show mediaImgContent scp"]').get_attribute(
-                        "src")
-                except:
-                    ticket_image = None
-
-                if ticket_image and ticket_text:
-                    ticket_text = ticket_text + "\n" + ticket_image
-                elif ticket_image and ticket_text == "":
-                    ticket_text = ticket_image
-
-                per_ticket_content = [ticket_time, ticket_name, ticket_text, ticket_link]
-                if ticket_link == "Inbox":
-                    if per_ticket_content not in self.inbox_tickets:
-                        self.inbox_tickets.append(per_ticket_content)
-                elif ticket_link != "" and ticket_link != "Inbox":
-                    if per_ticket_content not in self.comment_tickets:
-                        self.comment_tickets.append(per_ticket_content)
-
-                # print(ticket_name,ticket_text,ticket_link,ticket_time,"\n")
-                # if ticket_image:
-                #     print(ticket_image,"\n")
-
         scroll_height = -30
         for i in range(scrolltimes):
             scroll_height += 30
@@ -418,14 +366,6 @@ class pandoraBot:
     def getTickets(self,scrolls = 5 ):
         scroll_box_public = self.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div')
         scroll_box_private = self.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[3]/div/div[2]/div[2]/div/div/section/div')
-        #scroll_box_private[0].location_once_scrolled_into_view
-        #scroll_box_public[0].location_once_scrolled_into_view
-        # random_user_private = a.driver.find_elements_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[3]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[2]/section/section/article/div/div/section[2]/div[1]/div/div[1]/div[1]/div/div')
-        # random_user_private = a.driver.find_elements_by_xpath('//div[contains(text(),"Bleu Loi")]')
-        # random_user_private[0].location_once_scrolled_into_view
-
-        # from selenium.webdriver.common.action_chains import ActionChains
-        # ActionChains(a.driver).move_to_element(scroll_box_private).perform()
 
         scroll_height = -260
         for _ in range(scrolls):
@@ -551,26 +491,6 @@ class pandoraBot:
                     sheet_private.cell(row=2+i,column=n+1).value = each_piece_of_info
 
             wb.save(self.export_path)
-
-    def _reply(self):
-        ticket_frame = a.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]')
-        specific_user = a.driver.find_element_by_xpath('//div[contains(text(),"Kit Derek Kam")]')
-        specific_content = a.driver.find_element_by_xpath('//span[contains(text(),"親生果个都無，你愛黎做乜")]')
-        hover = ActionChains(a.driver).move_to_element(ticket_frame)
-        hover.perform()
-        reply_btn = a.driver.find_element_by_xpath('//*[@id="sprEngagementWorkspace"]/div/div/div[2]/div/div[2]/div[2]/div/div/section/div/div/div/div/article[1]/section/section/article/div/div/section[2]/div[2]/div[3]/div/span/span[3]/button')
-        reply_btn.click()
-
-        reply_box = a.driver.find_element_by_xpath('//*[@id="sprBasePublisher_REPLY"]/div/section[3]/div/div/div[1]/div/div/div/div/div[2]/div')
-        reply_box.send_keys("test")
-
-        close_reply_box_btn = a.driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/article/div[1]/button')
-        close_reply_box_btn.click()
-
-        post_btn = a.driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/article/div[3]/div[2]/div/button[2]')
-        post_btn.click()
-
-
 
 
 
